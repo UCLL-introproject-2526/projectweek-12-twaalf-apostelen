@@ -4,9 +4,10 @@ import pygame
 
 # Create window with given 
 def create_main_surface():
-    screen_size = (1024, 768)
+    while True :
+        screen_size = (1024, 768)
 
-    pygame.display.set_mode(screen_size)
+        pygame.display.set_mode(screen_size)
 
 pygame.init()
 
