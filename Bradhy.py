@@ -1,97 +1,137 @@
 import pygame
-import random
 import sys
+import random
 
 pygame.init()
 
-WIDTH, HEIGHT = 400, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Piano Game - Basis")
-
-clock = pygame.time.Clock()
+# =====================
+# SETTINGS
+# =====================
+WIDTH, HEIGHT = 1100, 500
 FPS = 60
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Portal Piano Adventure")
+clock = pygame.time.Clock()
 
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-RED = (200, 0, 0)
+# =====================
+# LOAD ASSETS
+# =====================
+player_img = pygame.image.load("assets/player.png").convert_alpha()
+player_img = pygame.transform.scale(player_img, (128, 128))  # 👈 VEEL GROTER
 
-COLS = 4
-TILE_WIDTH = WIDTH // COLS
-TILE_HEIGHT = 120
-SPEED = 5
+background = pygame.image.load("assets/background.png").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
-tiles = []
-score = 0
+portal_img = pygame.image.load("assets/portal.png").convert_alpha()
+portal_img = pygame.transform.scale(portal_img, (200, 260))  # 👈 VEEL GROTER
+
+# =====================
+# PLAYER
+# =====================
+player_rect = player_img.get_rect(midbottom=(150, HEIGHT - 40))
+player_speed = 5
+
+# =====================
+# PORTAL
+# =====================
+portal_rect = portal_img.get_rect(midbottom=(850, HEIGHT - 40))
+
+# =====================
+# GAME STATES
+# =====================
+WORLD = "world"
+PIANO = "piano"
+state = WORLD
+
+# =====================
+# PIANO GAME
+# =====================
+lanes = ["A", "S", "D", "F"]
+lane_x = {"A": 350, "S": 450, "D": 550, "F": 650}
+notes = []
 font = pygame.font.SysFont(None, 36)
 
-class Tile:
-    def __init__(self, col):
-        self.col = col
-        self.x = col * TILE_WIDTH
-        self.y = -TILE_HEIGHT
-        self.rect = pygame.Rect(self.x, self.y, TILE_WIDTH, TILE_HEIGHT)
-        self.active = True
+def spawn_note():
+    key = random.choice(lanes)
+    rect = pygame.Rect(lane_x[key], -40, 40, 40)
+    notes.append({"key": key, "rect": rect})
 
-    def move(self):
-        self.y += SPEED
-        self.rect.y = self.y
-
-    def draw(self):
-        pygame.draw.rect(screen, BLACK, self.rect)
-
-def spawn_tile():
-    col = random.randint(0, COLS - 1)
-    tiles.append(Tile(col))
-
-running = True
+# =====================
+# MAIN LOOP
+# =====================
 spawn_timer = 0
+running = True
 
 while running:
     clock.tick(FPS)
-    spawn_timer += 1
+    keys = pygame.key.get_pressed()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
-            keys = {
-                pygame.K_a: 0,
-                pygame.K_s: 1,
-                pygame.K_d: 2,
-                pygame.K_f: 3
-            }
+        if state == PIANO and event.type == pygame.KEYDOWN:
+            for note in notes[:]:
+                if event.key == pygame.key.key_code(note["key"].lower()):
+                    if note["rect"].y > HEIGHT - 140:
+                        notes.remove(note)
 
-            if event.key in keys:
-                col = keys[event.key]
-                for tile in tiles:
-                    if tile.col == col and tile.y > HEIGHT - TILE_HEIGHT - 20:
-                        tiles.remove(tile)
-                        score += 1
-                        break
+    # =====================
+    # WORLD
+    # =====================
+    if state == WORLD:
+        screen.blit(background, (0, 0))
+        screen.blit(portal_img, portal_rect)
+        screen.blit(player_img, player_rect)
 
-    if spawn_timer > 60:
-        spawn_tile()
-        spawn_timer = 0
+        # Movement
+        if keys[pygame.K_a]:
+            player_rect.x -= player_speed
+        if keys[pygame.K_d]:
+            player_rect.x += player_speed
 
-    for tile in tiles[:]:
-        tile.move()
-        if tile.y > HEIGHT:
-            running = False
+        # Portal interaction
+        if player_rect.colliderect(portal_rect):
+            text = font.render("Press E to enter portal", True, (255, 255, 255))
+            screen.blit(text, (portal_rect.x - 20, portal_rect.y - 40))
 
-    screen.fill(WHITE)
+            if keys[pygame.K_e]:
+                state = PIANO
+                notes.clear()
+                spawn_timer = 0
 
-    for i in range(1, COLS):
-        pygame.draw.line(screen, GRAY, (i * TILE_WIDTH, 0), (i * TILE_WIDTH, HEIGHT))
+    # =====================
+    # PIANO GAME
+    # =====================
+    elif state == PIANO:
+        screen.fill((15, 15, 25))
 
-    for tile in tiles:
-        tile.draw()
+        # Lanes
+        for key, x in lane_x.items():
+            pygame.draw.rect(screen, (60, 60, 60), (x, 0, 40, HEIGHT))
+            label = font.render(key, True, (255, 255, 255))
+            screen.blit(label, (x + 10, HEIGHT - 40))
 
-    score_text = font.render(f"Score: {score}", True, RED)
-    screen.blit(score_text, (10, 10))
+        # Spawn notes
+        spawn_timer += 1
+        if spawn_timer > 35:
+            spawn_note()
+            spawn_timer = 0
 
-    pygame.display.flip()
+        # Move notes
+        for note in notes[:]:
+            note["rect"].y += 6
+            pygame.draw.rect(screen, (180, 200, 255), note["rect"])
+            if note["rect"].y > HEIGHT:
+                notes.remove(note)
+
+        exit_text = font.render("ESC to exit piano", True, (255, 255, 255))
+        screen.blit(exit_text, (20, 20))
+
+        if keys[pygame.K_ESCAPE]:
+            state = WORLD
+
+    pygame.display.update()
 
 pygame.quit()
 sys.exit()
