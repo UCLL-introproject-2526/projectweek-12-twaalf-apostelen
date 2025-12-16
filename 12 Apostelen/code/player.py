@@ -24,7 +24,12 @@ class Player(pygame.sprite.Sprite):
 
         self.health = PLAYER_HEALTH
 
-        self.gun_image = pygame.image.load(
+        # stamina 0..1
+        self.stamina = STAMINA_MAX
+        self.sprinting = False
+
+        # Gun image (schaal zodat verhouding klopt)
+        self.gun_image_original = pygame.image.load(
             os.path.join(BASE_DIR, "images", "gun", "gun.png")
         ).convert_alpha()
 
@@ -34,15 +39,6 @@ class Player(pygame.sprite.Sprite):
             (int(self.gun_image_original.get_width() * 0.45),
              int(self.gun_image_original.get_height() * 0.45))
         )
-
-        # 🔫 Bullet image
-        self.bullet_image = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "gun", "bullet.png")
-        ).convert()
-        self.bullet_image.set_colorkey((0, 0, 0))
-
-        # 👇 Hier pas je de grootte aan
-        self.bullet_image = pygame.transform.scale(self.bullet_image, (20, 20))  # << verander dit
 
     def import_assets(self):
         base = os.path.join(BASE_DIR, "images", "player")
@@ -82,6 +78,7 @@ class Player(pygame.sprite.Sprite):
         if now - self.last_shot >= BULLET_COOLDOWN:
             self.last_shot = now
             Bullet(self.rect.center, pygame.mouse.get_pos(), self.groups)
+            self.shoot_sound.play()
 
     def move(self, dt):
         moving = self.direction.length() > 0
