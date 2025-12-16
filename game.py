@@ -1,37 +1,110 @@
-
-
 import pygame
+import sys
+
 
 pygame.init()
-screen = pygame.display.set_mode((800, 600))
+
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 680
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Tile Map Example")
+
 clock = pygame.time.Clock()
 
-player_rect = pygame.Rect(300, 200, 50, 50)
-speed = 10
+
+TILE_SIZE = 40
+PLAYER_SPEED = 4
+
+
+level = [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W........................W",
+    "W..P.....................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "W........................W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWW"
+]
+
+
+def build_level(level_data):
+    walls = []
+    player_rect = None
+
+    for y, row in enumerate(level_data):
+        for x, tile in enumerate(row):
+            world_x = x * TILE_SIZE
+            world_y = y * TILE_SIZE
+
+            if tile == "W":
+                wall = pygame.Rect(world_x, world_y, TILE_SIZE, TILE_SIZE)
+                walls.append(wall)
+
+            if tile == "P":
+                player_rect = pygame.Rect(world_x, world_y, TILE_SIZE, TILE_SIZE)
+
+    return walls, player_rect
+
+walls, player = build_level(level)
+
 
 running = True
 while running:
+    clock.tick(60)
+
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+  
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_rect.x -= speed
-    if keys[pygame.K_RIGHT]:
-        player_rect.x += speed
-    if keys[pygame.K_UP]:
-        player_rect.y -= speed
-    if keys[pygame.K_DOWN]:
-        player_rect.y += speed
+    dx = dy = 0
 
-    screen.fill("black")
-    pygame.draw.rect(screen, "blue", player_rect)
+    if keys[pygame.K_LEFT]:
+        dx = -PLAYER_SPEED
+    if keys[pygame.K_RIGHT]:
+        dx = PLAYER_SPEED
+    if keys[pygame.K_UP]:
+        dy = -PLAYER_SPEED
+    if keys[pygame.K_DOWN]:
+        dy = PLAYER_SPEED
+
+
+    player.x += dx
+    for wall in walls:
+        if player.colliderect(wall):
+            if dx > 0:
+                player.right = wall.left
+            if dx < 0:
+                player.left = wall.right
+
+    player.y += dy
+    for wall in walls:
+        if player.colliderect(wall):
+            if dy > 0:
+                player.bottom = wall.top
+            if dy < 0:
+                player.top = wall.bottom
+
+    screen.fill((30, 30, 30))
+
+    for wall in walls:
+        pygame.draw.rect(screen, (100, 100, 100), wall)
+
+    pygame.draw.rect(screen, (50, 200, 50), player)
+
     pygame.display.flip()
-    clock.tick(60)
 
 pygame.quit()
-
-
-
-
+sys.exit()
