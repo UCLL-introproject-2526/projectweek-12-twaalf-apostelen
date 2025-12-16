@@ -18,9 +18,9 @@ class Game:
         self.countdown = 3
         self.countdown_time = 0
 
-        self.background = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "background.png")
-        ).convert()
+        bg = pygame.image.load(os.path.join(BASE_DIR, "images", "background.png")).convert()
+
+        self.background = pygame.transform.scale(bg, (WIDTH, HEIGHT))
 
         self.reset()
 
