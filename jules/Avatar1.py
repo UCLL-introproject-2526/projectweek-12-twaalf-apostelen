@@ -4,7 +4,6 @@ import os
 
 pygame.init()
 
-
 # scherm
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Knight movement")
@@ -37,44 +36,5 @@ while running:
     dt = clock.tick(60) / 1000  # delta tijd in seconden
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.quit:
             running = False
-
-    keys = pygame.key.get_pressed()
-
-    # beweging
-    moving = False
-    if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        x -= speed
-        facing_right = False
-        moving = True
-
-    if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        x += speed
-        facing_right = True
-        moving = True
-
-    if keys[pygame.K_w] or keys[pygame.K_UP]:
-        y -= speed
-        moving = True
-
-    if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        y += speed
-        moving = True
-
-    # animatie updaten
-    if moving:
-        current_frame += animation_speed
-        if current_frame >= len(frames):
-            current_frame = 0
-
-    sprite = frames[int(current_frame)]
-    if not facing_right:
-        sprite = pygame.transform.flip(sprite, True, False)
-
-    # tekenen
-    screen.fill((40, 40, 40))
-    screen.blit(sprite, (x, y))
-    pygame.display.flip()
-
-pygame.quit()
