@@ -240,9 +240,7 @@ __marimo__/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
-*.jpg
-*.jpeg
-*.png
+
 *.wav
 *.mp3
 *.ogg
