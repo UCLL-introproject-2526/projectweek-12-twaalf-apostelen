@@ -9,7 +9,7 @@ pygame.mixer.music.load("01. Ground Theme.mp3")
 pygame.mixer.music.play(-1)
 
 # Screen
-WIDTH, HEIGHT = 800, 400
+WIDTH, HEIGHT = 1920, 1080
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Mini Mario")
 
@@ -29,7 +29,7 @@ Mario_img = pygame.transform.scale(Mario_img, (50, 50))
 player_x, player_y = 100, HEIGHT - 100
 player_velocity_y = 0
 gravity = 1
-jump_strength = -15
+jump_strength = -50
 on_ground = False
 
 # Player rect for collisions

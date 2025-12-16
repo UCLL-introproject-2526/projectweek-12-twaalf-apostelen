@@ -1,67 +1,79 @@
 import pygame
+import random
 import sys
 
 pygame.init()
 
-# Window
-WIDTH, HEIGHT = 800, 400
+# Screen
+WIDTH, HEIGHT = 400, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Run & Jump Game")
+pygame.display.set_caption("Piano Tiles")
 
 clock = pygame.time.Clock()
-
-# Player
-player = pygame.Rect(100, 300, 40, 40)
-player_velocity = 0
-gravity = 1
-on_ground = True
-
-# Obstacle
-obstacle = pygame.Rect(800, 320, 40, 20)
-obstacle_speed = 6
+FPS = 60
 
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)
+GRAY = (200, 200, 200)
+BLUE = (0, 0, 255)
+
+# Tile settings
+TILE_WIDTH = WIDTH // 4
+TILE_HEIGHT = 150
+tile_speed = 5
+tiles = []
+
+# Score
+score = 0
+font = pygame.font.SysFont(None, 40)
+
+# Function to add a new tile
+def add_tile():
+    x = random.choice([0, TILE_WIDTH, 2*TILE_WIDTH, 3*TILE_WIDTH])
+    y = -TILE_HEIGHT
+    tiles.append(pygame.Rect(x, y, TILE_WIDTH, TILE_HEIGHT))
+
+# Add first tile
+add_tile()
 
 # Game loop
-while True:
+running = True
+while running:
+    screen.fill(WHITE)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            for tile in tiles:
+                if tile.collidepoint(pos):
+                    tiles.remove(tile)
+                    score += 1
+                    break
 
-        # Jump
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and on_ground:
-                player_velocity = -15
-                on_ground = False
+    # Move tiles
+    for tile in tiles:
+        tile.y += tile_speed
+        if tile.y > HEIGHT:
+            print(f"Game Over! Score: {score}")
+            pygame.quit()
+            sys.exit()
+    
+    # Add new tiles
+    if len(tiles) < 4:
+        add_tile()
 
-    # Gravity
-    player_velocity += gravity
-    player.y += player_velocity
+    # Draw tiles
+    for tile in tiles:
+        pygame.draw.rect(screen, BLACK, tile)
+        pygame.draw.rect(screen, GRAY, tile, 2)  # tile border
 
-    if player.y >= 300:
-        player.y = 300
-        player_velocity = 0
-        on_ground = True
-
-    # Move obstacle
-    obstacle.x -= obstacle_speed
-    if obstacle.x < -40:
-        obstacle.x = WIDTH
-
-    # Collision
-    if player.colliderect(obstacle):
-        print("Game Over!")
-        pygame.quit()
-        sys.exit()
-
-    # Draw
-    screen.fill(WHITE)
-    pygame.draw.rect(screen, BLACK, player)
-    pygame.draw.rect(screen, RED, obstacle)
+    # Draw score
+    score_text = font.render(f"Score: {score}", True, BLUE)
+    screen.blit(score_text, (10, 10))
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(FPS)
