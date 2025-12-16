@@ -6,19 +6,20 @@ import pygame
 
 
 pygame.init()
-
+# --------------------
+# CONSTANTS
+# --------------------
+TILE_SIZE = 40
+PLAYER_SPEED = 4
+# --------------------
+# CONSTANTS
+# --------------------
 SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 680
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Tile Map Example")
 
 clock = pygame.time.Clock()
-# --------------------
-# CONSTANTS
-# --------------------
-
-TILE_SIZE = 40
-PLAYER_SPEED = 4
 
 # --------------------
 # LEVEL DATA
@@ -68,6 +69,8 @@ def build_level(level_data):
 
 walls, player = build_level(level)
 
+player_img = pygame.image.load("afbeeldingen mannetje/frame_04.png").convert_alpha()
+player_img = pygame.transform.scale(player_img, (200, 200))
 
 running = True
 while running:
@@ -102,7 +105,7 @@ while running:
         if player.colliderect(wall):
             if dx > 0:
                 player.right = wall.left
-            if dx < 0:
+            elif dx < 0:
                 player.left = wall.right
 
     player.y += dy
@@ -110,7 +113,7 @@ while running:
         if player.colliderect(wall):
             if dy > 0:
                 player.bottom = wall.top
-            if dy < 0:
+            elif dy < 0:
                 player.top = wall.bottom
 
     screen.fill((30, 30, 30))
@@ -118,7 +121,7 @@ while running:
     for wall in walls:
         pygame.draw.rect(screen, (100, 100, 100), wall)
 
-    pygame.draw.rect(screen, (50, 200, 50), player)
+    screen.blit(player_img ,player )
 
     pygame.display.flip()
 
