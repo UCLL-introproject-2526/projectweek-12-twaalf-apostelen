@@ -1,6 +1,8 @@
 import pygame
-import sys
 
+# --------
+# init
+# -------
 
 
 pygame.init()
@@ -11,16 +13,20 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Tile Map Example")
 
 clock = pygame.time.Clock()
-
+# --------------------
+# CONSTANTS
+# --------------------
 
 TILE_SIZE = 40
 PLAYER_SPEED = 4
 
+# --------------------
+# LEVEL DATA
+# --------------------
 
 level = [
     "WWWWWWWWWWWWWWWWWWWWWWWWWW",
     "W........................W",
-    "W..P.....................W",
     "W........................W",
     "W........................W",
     "W........................W",
@@ -33,10 +39,14 @@ level = [
     "W........................W",
     "W........................W",
     "W........................W",
+    "W.........P..............W",
     "W........................W",
     "WWWWWWWWWWWWWWWWWWWWWWWWWW"
 ]
 
+# --------------------
+# BUILD LEVEL
+# --------------------
 
 def build_level(level_data):
     walls = []
@@ -61,7 +71,11 @@ walls, player = build_level(level)
 
 running = True
 while running:
-    clock.tick(60)
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LCTRL]:
+        clock.tick(90)
+    else:
+        clock.tick(60)
 
 
     for event in pygame.event.get():
@@ -69,8 +83,9 @@ while running:
             running = False
 
   
-    keys = pygame.key.get_pressed()
-    dx = dy = 0
+    
+    dx = 0
+    dy = 0
 
     if keys[pygame.K_LEFT]:
         dx = -PLAYER_SPEED
@@ -108,4 +123,4 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
-sys.exit()
+
