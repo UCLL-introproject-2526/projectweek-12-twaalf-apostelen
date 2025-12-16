@@ -13,10 +13,7 @@ def main():
         pygame.display.flip()
         
 
-def create_main_surface():
-    screen_size = (1024, 768)
-    pygame.display.set_mode(screen_size)
-    return screen_size
+
 
 main()
 # import pygame
@@ -25,6 +22,7 @@ main()
 # def main(): 
 #     screen_size = (1024, 768)
 #     screen = pygame.display.set_mode(screen_size)
+
     
 #     while True:
 #         screen.fill((0,0,0))
