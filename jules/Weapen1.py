@@ -14,8 +14,9 @@ clock = pygame.time.Clock()
 gun_img = pygame.image.load("Jules/Gun1.jpeg").convert_alpha()  # convert gebruikt geen transparantie
 bullet_img = pygame.image.load("Jules/Bullet1.jpeg").convert_alpha()
 
+
 # Grootte aanpassen (optioneel)
-gun_img = pygame.transform.scale(gun_img, (120, 60))
+gun_img = pygame.transform.scale(gun_img, (80, 60))
 bullet_img = pygame.transform.scale(bullet_img, (20, 10))
 
 # Gun positie
@@ -39,8 +40,8 @@ while True:
         # Linker muisklik → kogel schieten
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # linker muisknop
-                bullet_x = gun_x + gun_img.get_width() - 45
-                bullet_y = gun_y + loop_offset - bullet_img.get_height() // 2
+                bullet_x = gun_x + gun_img.get_width() - 17
+                bullet_y = gun_y + loop_offset - bullet_img.get_height() // 2 - 9
                 bullets.append(pygame.Rect(bullet_x, bullet_y, bullet_img.get_width(), bullet_img.get_height()))
 
     # Kogels bewegen
