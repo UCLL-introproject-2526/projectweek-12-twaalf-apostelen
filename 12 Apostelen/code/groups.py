@@ -5,3 +5,4 @@ class GameGroups:
         self.all_sprites = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+
