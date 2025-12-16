@@ -6,8 +6,45 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
-        screen.fill((0,0,0))
-        pygame.draw.circle(screen,(255,0,0),(500,500) ,20)
+            
+
+        screen.fill((0,0,255))
+        player_pos = 0
+        pygame.draw.rect(screen, 'red', player_pos ,(30, 0, 300, 500))
+        
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_q]:
+            player_pos.y -= 300 
+
+        pygame.draw.rect(screen, 'red', player_pos ,(30, 0, 300, 500))
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         pygame.display.flip()
+    
         
 
+
+
+
+
+
+
+
+
+
+
+
+
+main()
