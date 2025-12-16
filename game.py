@@ -2,6 +2,7 @@ import pygame
 import sys
 
 
+
 pygame.init()
 
 SCREEN_WIDTH = 1024
