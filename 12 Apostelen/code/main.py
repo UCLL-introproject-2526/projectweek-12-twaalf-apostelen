@@ -32,6 +32,7 @@ class Game:
         self.intro_image = pygame.transform.scale(intro, (WIDTH, HEIGHT))
 
         self.state = "intro"   # intro -> countdown -> game -> gameover
+        self.first_launch = True
         self.countdown = 3
         self.countdown_timer = 0
 
@@ -99,14 +100,19 @@ class Game:
                     running = False
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    if self.state == "intro":
+                    if self.state == "intro" and self.first_launch:
+                        self.first_launch = False
                         self.state = "countdown"
                         self.countdown = 3
                         self.countdown_timer = 0
 
+
                     elif self.state == "gameover":
                         self.reset_game()
-                        self.state = "intro"
+                        self.state = "countdown"
+                        self.countdown = 3
+                        self.countdown_timer = 0
+
 
             # INTRO
             if self.state == "intro":
