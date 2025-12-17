@@ -41,13 +41,13 @@ class Bullet(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, player, groups, enemy_type, impact_sound):
+    def __init__(self, pos, player, groups, enemy_type, impact_sound, game):
         super().__init__(groups.all_sprites, groups.enemies)
         self.groups = groups
         self.player = player
         self.impact_sound = impact_sound
+        self.game = game
 
-        # frames 0-3 uit images/enemies/<type>/
         folder = os.path.join(BASE_DIR, "images", "enemies", enemy_type)
         self.frames = load_frames(folder, 1.0)
         self.frame_index = 0
@@ -70,13 +70,12 @@ class Enemy(pygame.sprite.Sprite):
 
         self.animate(dt)
 
-        # bullet hit => enemy weg + sound
+        # bullet hit => enemy weg + sound + score
         if pygame.sprite.spritecollide(self, self.groups.bullets, True):
             self.impact_sound.play()
+            self.game.score += 1
             self.kill()
 
         # damage bij aanraken
         if self.rect.colliderect(self.player.rect):
             self.player.health -= ENEMY_DAMAGE_PER_SEC * dt
-
-

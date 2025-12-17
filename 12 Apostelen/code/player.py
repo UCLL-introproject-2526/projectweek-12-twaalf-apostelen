@@ -10,7 +10,6 @@ class Player(pygame.sprite.Sprite):
         self.groups = groups
         self.shoot_sound = shoot_sound
 
-        # Animaties
         self.animations = {}
         self.import_assets()
 
@@ -24,16 +23,16 @@ class Player(pygame.sprite.Sprite):
 
         self.health = PLAYER_HEALTH
 
-        # stamina 0..1
+        # stamina
         self.stamina = STAMINA_MAX
         self.sprinting = False
 
-        # Gun image (schaal zodat verhouding klopt)
+        # Gun
         self.gun_image_original = pygame.image.load(
             os.path.join(BASE_DIR, "images", "gun", "gun.png")
         ).convert_alpha()
 
-        # gun kleiner (pas aan als jij wil)
+        # gun kleiner (pas aan als je wil)
         self.gun_image_original = pygame.transform.scale(
             self.gun_image_original,
             (int(self.gun_image_original.get_width() * 0.45),
@@ -63,13 +62,9 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 1
             self.status = "right"
 
-        # sprint
-        if keys[pygame.K_LSHIFT] and self.stamina > 0:
-            self.sprinting = True
-        else:
-            self.sprinting = False
+        # sprint alleen als stamina > 0
+        self.sprinting = keys[pygame.K_LSHIFT] and self.stamina > 0
 
-        # schieten
         if pygame.mouse.get_pressed()[0]:
             self.shoot()
 
@@ -90,24 +85,21 @@ class Player(pygame.sprite.Sprite):
         if self.sprinting and moving:
             speed *= SPRINT_MULTIPLIER
             self.stamina -= STAMINA_DRAIN * dt
-            if self.stamina < 0:
+            if self.stamina <= 0:
                 self.stamina = 0
+                self.sprinting = False
         else:
-            # recover alleen als niet sprint
             self.stamina += STAMINA_RECOVER * dt
             if self.stamina > STAMINA_MAX:
                 self.stamina = STAMINA_MAX
 
         self.rect.center += self.direction * speed * dt
 
-        # clamp in scherm
-        self.rect.left = max(0, self.rect.left)
-        self.rect.right = min(WIDTH, self.rect.right)
-        self.rect.top = max(0, self.rect.top)
-        self.rect.bottom = min(HEIGHT, self.rect.bottom)
+        # in scherm blijven
+        self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
 
     def animate(self, dt):
-        # stil staan => frame 0 (geen animatie)
+        # stil staan => frame 0
         if self.direction.length() == 0:
             self.frame_index = 0
             self.image = self.animations[self.status][0]

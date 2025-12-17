@@ -29,4 +29,4 @@ BULLET_COOLDOWN = 650      # ms (trager schieten)
 ENEMY_SPEED = 200
 ENEMY_DAMAGE_PER_SEC = 30  # damage per seconde bij aanraken
 ENEMY_ANIMATION_SPEED = 8
-SPAWN_INTERVAL = 0.75       # seconds
+SPAWN_INTERVAL = 0.75      # seconds

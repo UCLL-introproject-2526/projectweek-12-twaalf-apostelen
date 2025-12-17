@@ -27,7 +27,11 @@ class Game:
         bg = pygame.image.load(os.path.join(BASE_DIR, "images", "background.png")).convert()
         self.background = pygame.transform.scale(bg, (WIDTH, HEIGHT))
 
-        self.state = "menu"          # menu -> countdown -> game -> gameover
+        # intro fullscreen
+        intro = pygame.image.load(os.path.join(BASE_DIR, "images", "intro.png")).convert()
+        self.intro_image = pygame.transform.scale(intro, (WIDTH, HEIGHT))
+
+        self.state = "intro"   # intro -> countdown -> game -> gameover
         self.countdown = 3
         self.countdown_timer = 0
 
@@ -35,15 +39,15 @@ class Game:
 
     def reset_game(self):
         self.groups = GameGroups()
-        self.player = Player((WIDTH//2, HEIGHT//2), self.groups, self.shoot_sound)
+        self.player = Player((WIDTH // 2, HEIGHT // 2), self.groups, self.shoot_sound)
 
         self.spawn_timer = 0
         self.enemy_types = ["skeleton", "bat", "blob"]
+        self.score = 0
 
     def spawn_enemy(self):
         enemy_type = random.choice(self.enemy_types)
 
-        # spawn aan randen
         side = random.choice(["left", "right", "top", "bottom"])
         if side == "left":
             x, y = -40, random.randint(0, HEIGHT)
@@ -54,11 +58,11 @@ class Game:
         else:
             x, y = random.randint(0, WIDTH), HEIGHT + 40
 
-        Enemy((x, y), self.player, self.groups, enemy_type, self.impact_sound)
+        Enemy((x, y), self.player, self.groups, enemy_type, self.impact_sound, self)
 
     def draw_center_text(self, text, font, y):
         surf = font.render(text, True, "white")
-        rect = surf.get_rect(center=(WIDTH//2, y))
+        rect = surf.get_rect(center=(WIDTH // 2, y))
         self.screen.blit(surf, rect)
 
     def draw_bars(self):
@@ -67,18 +71,23 @@ class Game:
         w, h = 300, 20
         ratio = max(0, self.player.health) / PLAYER_HEALTH
 
-        pygame.draw.rect(self.screen, (60,60,60), (x, y, w, h))
-        pygame.draw.rect(self.screen, (200,50,50), (x, y, w * ratio, h))
-        pygame.draw.rect(self.screen, (255,255,255), (x, y, w, h), 2)
+        pygame.draw.rect(self.screen, (60, 60, 60), (x, y, w, h))
+        pygame.draw.rect(self.screen, (200, 50, 50), (x, y, w * ratio, h))
+        pygame.draw.rect(self.screen, (255, 255, 255), (x, y, w, h), 2)
 
-        # stamina bar (onder health)
+        # stamina bar
         y2 = y + 28
         h2 = 12
         stamina_ratio = max(0, self.player.stamina) / STAMINA_MAX
 
-        pygame.draw.rect(self.screen, (60,60,60), (x, y2, w, h2))
-        pygame.draw.rect(self.screen, (50,200,50), (x, y2, w * stamina_ratio, h2))
-        pygame.draw.rect(self.screen, (255,255,255), (x, y2, w, h2), 2)
+        pygame.draw.rect(self.screen, (60, 60, 60), (x, y2, w, h2))
+        pygame.draw.rect(self.screen, (50, 200, 50), (x, y2, w * stamina_ratio, h2))
+        pygame.draw.rect(self.screen, (255, 255, 255), (x, y2, w, h2), 2)
+
+    def draw_score(self):
+        text = self.font_small.render(f"Score: {self.score}", True, "white")
+        rect = text.get_rect(topright=(WIDTH - 20, 20))
+        self.screen.blit(text, rect)
 
     def run(self):
         running = True
@@ -90,24 +99,22 @@ class Game:
                     running = False
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    if self.state == "menu":
+                    if self.state == "intro":
                         self.state = "countdown"
                         self.countdown = 3
                         self.countdown_timer = 0
 
                     elif self.state == "gameover":
                         self.reset_game()
-                        self.state = "menu"
+                        self.state = "intro"
 
-            self.screen.blit(self.background, (0, 0))
-
-            # MENU
-            if self.state == "menu":
-                self.draw_center_text("12 Apostelen", self.font_big, 250)
-                self.draw_center_text("Press ENTER to start", self.font_small, 340)
+            # INTRO
+            if self.state == "intro":
+                self.screen.blit(self.intro_image, (0, 0))
 
             # COUNTDOWN
             elif self.state == "countdown":
+                self.screen.blit(self.background, (0, 0))
                 self.countdown_timer += dt
                 if self.countdown_timer >= 1:
                     self.countdown -= 1
@@ -116,10 +123,12 @@ class Game:
                 if self.countdown <= 0:
                     self.state = "game"
                 else:
-                    self.draw_center_text(str(self.countdown), self.font_big, HEIGHT//2)
+                    self.draw_center_text(str(self.countdown), self.font_big, HEIGHT // 2)
 
             # GAME
             elif self.state == "game":
+                self.screen.blit(self.background, (0, 0))
+
                 self.spawn_timer += dt
                 if self.spawn_timer >= SPAWN_INTERVAL:
                     self.spawn_enemy()
@@ -127,18 +136,20 @@ class Game:
 
                 self.groups.all_sprites.update(dt)
 
-                # draw
                 self.groups.all_sprites.draw(self.screen)
                 self.player.draw_gun(self.screen)
                 self.draw_bars()
+                self.draw_score()
 
                 if self.player.health <= 0:
                     self.state = "gameover"
 
             # GAME OVER
             elif self.state == "gameover":
-                self.draw_center_text("GAME OVER", self.font_big, 280)
-                self.draw_center_text("Press ENTER to try again", self.font_small, 360)
+                self.screen.blit(self.background, (0, 0))
+                self.draw_center_text("GAME OVER", self.font_big, 260)
+                self.draw_center_text(f"Score: {self.score}", self.font_mid, 340)
+                self.draw_center_text("Press ENTER to try again", self.font_small, 420)
 
             pygame.display.update()
 
