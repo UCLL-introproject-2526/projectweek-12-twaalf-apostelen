@@ -11,10 +11,12 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-
+        self.screen_mode = 'None'
+        self.fullscreen = True
         self.screen = pygame.display.set_mode(
         (WIDTH, HEIGHT),
-        pygame.SCALED | pygame.FULLSCREEN)
+        pygame.SCALED | pygame.FULLSCREEN
+)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
 
@@ -107,6 +109,22 @@ class Game:
 
     # --------------------------------------------------
 
+    def toggle_fullscreen(self):
+        self.fullscreen = not self.fullscreen
+
+        if self.fullscreen:
+            self.screen = pygame.display.set_mode(
+            (WIDTH, HEIGHT),
+            pygame.SCALED | pygame.FULLSCREEN
+        )
+        else:
+            self.screen = pygame.display.set_mode(
+            (WIDTH, HEIGHT),
+            pygame.SCALED
+        )
+
+
+    # --------------------------------------------------
     def draw_bars(self):
         # HP
         x, y = 20, 20
@@ -159,6 +177,9 @@ class Game:
                         self.state = "countdown"
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
                     self.state = 'intro'
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
+                    self.toggle_fullscreen()
+
 
             # --------------------------------------------------
             # INTRO
