@@ -28,31 +28,31 @@ class Game:
 
         # sounds
         self.shoot_sound = pygame.mixer.Sound(
-            os.path.join(BASE_DIR, "audio", "shoot.wav"))
+            os.path.join(BASE_DIR, "assets", 'audio', "shoot.wav"))
         self.shoot_sound.set_volume(SHOOT_SOUND)
         self.wave_sound = pygame.mixer.Sound(
-            os.path.join(BASE_DIR, "audio", "Wave.mp3"))
+            os.path.join(BASE_DIR,  "assets", 'audio', "Wave.mp3"))
         self.wave_sound.set_volume(WAVE_SOUND)
         self.impact_sound = pygame.mixer.Sound(
-            os.path.join(BASE_DIR, "audio", "Hit.mp3"))
+            os.path.join(BASE_DIR,  "assets", 'audio', "Hit.mp3"))
         self.impact_sound.set_volume(IMPACT_SOUND)
         self.die_sound = pygame.mixer.Sound(
-            os.path.join(BASE_DIR, "audio", "Die.mp3"))
+            os.path.join(BASE_DIR,  "assets", 'audio', "Die.mp3"))
         self.die_sound.set_volume(DIE_SOUND)
 
         # background
         bg = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "background.png")).convert()
+            os.path.join(BASE_DIR, 'assets', "images", "background.png")).convert()
         self.background = pygame.transform.scale(bg, (WIDTH, HEIGHT))
 
         # intro image
         intro = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "intro.png")).convert()
+            os.path.join(BASE_DIR, 'assets', "images", "intro.png")).convert()
         self.intro_image = pygame.transform.scale(intro, (WIDTH, HEIGHT))
 
         # controls image
         controls = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "controls.png")).convert()
+            os.path.join(BASE_DIR, 'assets', "images", "controls.png")).convert()
         self.controls_image = pygame.transform.scale(controls, (WIDTH, HEIGHT))
 
 
