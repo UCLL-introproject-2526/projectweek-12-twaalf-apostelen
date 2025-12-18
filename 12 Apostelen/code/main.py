@@ -47,7 +47,14 @@ class Game:
             os.path.join(BASE_DIR, "images", "intro.png")).convert()
         self.intro_image = pygame.transform.scale(intro, (WIDTH, HEIGHT))
 
+        # controls image
+        controls = pygame.image.load(
+            os.path.join(BASE_DIR, "images", "controls.png")).convert()
+        self.controls_image = pygame.transform.scale(controls, (WIDTH, HEIGHT))
+
+
         self.state = "intro"   # intro -> countdown -> game -> wave_text -> gameover
+        self.controls_timer = 0
         self.first_launch = True
 
         self.reset_game()
@@ -173,13 +180,13 @@ class Game:
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     if self.state == "intro":
-                        self.state = "countdown"
-                        self.countdown = 3
-                        self.countdown_timer = 0
+                        self.state = "controls"
+                        self.controls_timer = 0
 
                     elif self.state == "gameover":
                         self.reset_game()
                         self.state = "countdown"
+
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
                     self.state = 'intro'
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
@@ -190,6 +197,39 @@ class Game:
             # INTRO
             if self.state == "intro":
                 self.screen.blit(self.intro_image, (0, 0))
+
+            # --------------------------------------------------
+            # CONTROLS SCREEN
+            elif self.state == "controls":
+                self.screen.blit(self.controls_image, (0, 0))
+                self.controls_timer += dt
+
+            # loading bar
+                bar_width = 400
+                bar_height = 20
+                progress = min(self.controls_timer / CONTROLS_TIME, 1)
+
+                x = (WIDTH - bar_width) // 2
+                y = HEIGHT - 80
+
+                pygame.draw.rect(self.screen, (60, 60, 60), (x, y, bar_width, bar_height))
+                pygame.draw.rect(
+                self.screen,
+                (50, 200, 50),
+                (x, y, bar_width * progress, bar_height)
+                )
+                pygame.draw.rect(
+                self.screen,
+                (255, 255, 255),
+                (x, y, bar_width, bar_height),
+                2
+                )
+
+                if self.controls_timer >= CONTROLS_TIME:
+                    self.state = "countdown"
+                    self.countdown = 3
+                    self.countdown_timer = 0
+
 
             # --------------------------------------------------
             # COUNTDOWN
