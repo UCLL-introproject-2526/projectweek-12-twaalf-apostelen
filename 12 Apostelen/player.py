@@ -26,8 +26,7 @@ class Player(pygame.sprite.Sprite):
         self.sprinting = False
 
         self.gun_image = pygame.image.load(
-            pygame.image.load(
-            os.path.join(BASE_DIR, "assets", "images", "gun", "gun.png")).convert_alpha())
+            os.path.join(BASE_DIR, "assets", "images", "gun", "gun.png")).convert_alpha()
 
         self.gun_image = pygame.transform.scale(
             self.gun_image,
