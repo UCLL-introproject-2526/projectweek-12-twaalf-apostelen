@@ -45,6 +45,8 @@ class Game:
         self.state = "intro"   # intro -> countdown -> game -> wave_text -> gameover
         self.first_launch = True
 
+        self.reset_game()
+
     # --------------------------------------------------
 
     def reset_game(self):
@@ -71,8 +73,6 @@ class Game:
         self.countdown_timer = 0
 
         self.enemy_types = ["skeleton", "bat", "blob"]
-        
-        self.reset_game()
 
     # --------------------------------------------------
 
