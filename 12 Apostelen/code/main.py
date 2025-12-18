@@ -29,8 +29,13 @@ class Game:
         # sounds
         self.shoot_sound = pygame.mixer.Sound(
             os.path.join(BASE_DIR, "audio", "shoot.wav"))
+        self.shoot_sound.set_volume(SHOOT_SOUND)
+        self.wave_sound = pygame.mixer.Sound(
+            os.path.join(BASE_DIR, "audio", "Wave.mp3"))
+        self.wave_sound.set_volume(WAVE_SOUND)
         self.impact_sound = pygame.mixer.Sound(
-            os.path.join(BASE_DIR, "audio", "impact.ogg"))
+            os.path.join(BASE_DIR, "audio", "Hit.mp3"))
+        self.impact_sound.set_volume(IMPACT_SOUND)
 
         # background
         bg = pygame.image.load(
@@ -253,7 +258,7 @@ class Game:
                         MIN_SPAWN_INTERVAL,
                         self.spawn_interval - WAVE_SPAWN_DECREASE
                     )
-
+                    self.wave_sound.play()
                     self.state = "wave_text"
 
                 if self.player.health <= 0:
