@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 import os
 import random
@@ -36,6 +37,9 @@ class Game:
         self.impact_sound = pygame.mixer.Sound(
             os.path.join(BASE_DIR, "audio", "Hit.mp3"))
         self.impact_sound.set_volume(IMPACT_SOUND)
+        self.die_sound = pygame.mixer.Sound(
+            os.path.join(BASE_DIR, "audio", "Die.mp3"))
+        self.die_sound.set_volume(DIE_SOUND)
 
         # background
         bg = pygame.image.load(
@@ -80,6 +84,8 @@ class Game:
 
         self.wave_pause = False
         self.wave_timer = 0
+
+        self.played_die_sound = False
 
         self.countdown = 3
         self.countdown_timer = 0
@@ -166,7 +172,7 @@ class Game:
 
     # --------------------------------------------------
 
-    def run(self):
+    async def run(self):
         running = True
         while running:
             dt = self.clock.tick(FPS) / 1000
@@ -302,8 +308,11 @@ class Game:
                     self.state = "wave_text"
 
                 if self.player.health <= 0:
-                    self.state = "gameover"
+                    if not self.played_die_sound:
+                        self.die_sound.play()
+                        self.played_die_sound = True
 
+                    self.state = "gameover"
             # --------------------------------------------------
             # GAME OVER
             elif self.state == "gameover":
@@ -319,11 +328,13 @@ class Game:
                     self.font_small,
                     400
                 )
-
             pygame.display.update()
+            await asyncio.sleep(0)
 
         pygame.quit()
 
-
+async def main():
+    game = Game()
+    await game.run()
 if __name__ == "__main__":
-    Game().run()
+    asyncio.run(main())

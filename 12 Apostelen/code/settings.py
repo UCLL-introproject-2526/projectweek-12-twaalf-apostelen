@@ -39,5 +39,6 @@ MIN_SPAWN_INTERVAL = 0.2
 WAVE_SOUND = 1.5
 IMPACT_SOUND = 0.20
 SHOOT_SOUND = 0.60
+DIE_SOUND = 1
 # Intro / controls
 CONTROLS_TIME = 5.0   # seconden dat controls-scherm zichtbaar is
