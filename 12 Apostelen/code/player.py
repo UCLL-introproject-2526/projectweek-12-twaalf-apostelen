@@ -91,20 +91,6 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.center += self.direction * speed * dt
         self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
-        # speed = PLAYER_SPEED
-
- 
-            # if self.sprinting:
-            #     speed *= SPRINT_MULTIPLIER
-            # self.stamina -= STAMINA_DRAIN * dt
-            # if self.stamina <= 0:
-            #     self.stamina = 0
-            #     self.sprinting = False
-             # else:
-            #     self.stamina = min(STAMINA_MAX, self.stamina + STAMINA_RECOVER * dt)
-
-        # self.rect.center += self.direction * speed * dt
-        # self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
 
     def animate(self, dt):
         if self.direction.length() == 0:
