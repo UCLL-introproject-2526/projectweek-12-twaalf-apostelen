@@ -340,6 +340,7 @@ class Game:
 
         pygame.quit()
 
+
 async def main():
     game = Game()
     await game.run()
