@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 import os
 import random
@@ -166,7 +167,7 @@ class Game:
 
     # --------------------------------------------------
 
-    def run(self):
+    async def run(self):
         running = True
         while running:
             dt = self.clock.tick(FPS) / 1000
@@ -319,11 +320,13 @@ class Game:
                     self.font_small,
                     400
                 )
-
             pygame.display.update()
+            await asyncio.sleep(0)
 
         pygame.quit()
 
-
+async def main():
+    game = Game()
+    await game.run()
 if __name__ == "__main__":
-    Game().run()
+    asyncio.run(main())
