@@ -29,12 +29,13 @@ class Game:
         # sounds
         self.shoot_sound = pygame.mixer.Sound(
             os.path.join(BASE_DIR, "audio", "shoot.wav"))
+        self.shoot_sound.set_volume(SHOOT_SOUND)
         self.wave_sound = pygame.mixer.Sound(
             os.path.join(BASE_DIR, "audio", "Wave.mp3"))
-        self.wave_sound.set_volume(1)
+        self.wave_sound.set_volume(WAVE_SOUND)
         self.impact_sound = pygame.mixer.Sound(
             os.path.join(BASE_DIR, "audio", "Hit.mp3"))
-        self.impact_sound.set_volume(0.5)
+        self.impact_sound.set_volume(IMPACT_SOUND)
 
         # background
         bg = pygame.image.load(
