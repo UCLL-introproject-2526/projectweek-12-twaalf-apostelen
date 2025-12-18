@@ -23,13 +23,12 @@ class Bullet(pygame.sprite.Sprite):
         # optioneel schalen
         self.image = pygame.transform.scale(
             self.image,
-            (int(self.image.get_width() * 0.6),
-             int(self.image.get_height() * 0.6))
+            (int(self.image.get_width() * BULLET_SCALE),
+             int(self.image.get_height() * BULLET_SCALE))
         )
 
         self.rect = self.image.get_rect(center=pos)
 
-        # 🔴 DIT MOET ER ZIJN
         direction = pygame.Vector2(target) - pygame.Vector2(pos)
         if direction.length() == 0:
             direction = pygame.Vector2(1, 0)
