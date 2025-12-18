@@ -316,13 +316,21 @@ class Game:
             # --------------------------------------------------
             # GAME OVER
             elif self.state == "gameover":
+                # normale background
                 self.screen.blit(self.background, (0, 0))
+
+                # zwarte overlay (maakt alles donker / "dead effect")
+                overlay = pygame.Surface(self.screen.get_size())
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(150)  # hoger = donkerder (0-255)
+                self.screen.blit(overlay, (0, 0))
+
+                # teksten
                 self.draw_center_text("GAME OVER", self.font_big, 260)
                 self.draw_center_text(
-                    f"Score: {self.score}",
-                    self.font_mid,
-                    330
-                )
+                f"Score: {self.score}",
+                self.font_mid,
+                330)                            
                 self.draw_center_text(
                     "Press ENTER to try again",
                     self.font_small,
