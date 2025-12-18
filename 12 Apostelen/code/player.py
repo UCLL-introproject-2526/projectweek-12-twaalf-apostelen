@@ -58,7 +58,7 @@ class Player(pygame.sprite.Sprite):
             self.direction.x = 1
             self.status = "right"
 
-        self.sprinting = keys[pygame.K_LSHIFT] and self.stamina > 0
+        self.shift_held = keys[pygame.K_LSHIFT]
 
         if pygame.mouse.get_pressed()[0]:
             self.shoot()
@@ -73,16 +73,21 @@ class Player(pygame.sprite.Sprite):
     def move(self, dt):
         if self.direction.length():
             self.direction.normalize_ip()
-
         speed = PLAYER_SPEED
-        if self.sprinting:
+
+        # Decide sprint FIRST
+        if self.shift_held and self.stamina > 0.05:
             speed *= SPRINT_MULTIPLIER
+
+        # Drain stamina
             self.stamina -= STAMINA_DRAIN * dt
-            if self.stamina <= 0:
+            if self.stamina < 0:
                 self.stamina = 0
-                self.sprinting = False
         else:
-            self.stamina = min(STAMINA_MAX, self.stamina + STAMINA_RECOVER * dt)
+        # Recover stamina
+            self.stamina += STAMINA_RECOVER * dt
+            if self.stamina > STAMINA_MAX:
+                self.stamina = STAMINA_MAX
 
         self.rect.center += self.direction * speed * dt
         self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
