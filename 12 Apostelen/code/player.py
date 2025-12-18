@@ -10,7 +10,6 @@ class Player(pygame.sprite.Sprite):
         self.groups = groups
         self.shoot_sound = shoot_sound
 
-        # Animaties
         self.animations = {}
         self.import_assets()
 
@@ -21,23 +20,19 @@ class Player(pygame.sprite.Sprite):
 
         self.direction = pygame.Vector2()
         self.last_shot = 0
-
         self.health = PLAYER_HEALTH
 
-        # stamina 0..1
         self.stamina = STAMINA_MAX
         self.sprinting = False
 
-        # Gun image (schaal zodat verhouding klopt)
-        self.gun_image_original = pygame.image.load(
+        self.gun_image = pygame.image.load(
             os.path.join(BASE_DIR, "images", "gun", "gun.png")
         ).convert_alpha()
 
-        # gun kleiner (pas aan als jij wil)
-        self.gun_image_original = pygame.transform.scale(
-            self.gun_image_original,
-            (int(self.gun_image_original.get_width() * 0.45),
-             int(self.gun_image_original.get_height() * 0.45))
+        self.gun_image = pygame.transform.scale(
+            self.gun_image,
+            (int(self.gun_image.get_width() * 0.45),
+             int(self.gun_image.get_height() * 0.45))
         )
 
     def import_assets(self):
@@ -49,27 +44,22 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         self.direction = pygame.Vector2()
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.direction.y = -1
             self.status = "up"
-        elif keys[pygame.K_s]:
+        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.direction.y = 1
             self.status = "down"
 
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.direction.x = -1
             self.status = "left"
-        elif keys[pygame.K_d]:
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.direction.x = 1
             self.status = "right"
 
-        # sprint
-        if keys[pygame.K_LSHIFT] and self.stamina > 0:
-            self.sprinting = True
-        else:
-            self.sprinting = False
+        self.sprinting = keys[pygame.K_LSHIFT] and self.stamina > 0
 
-        # schieten
         if pygame.mouse.get_pressed()[0]:
             self.shoot()
 
@@ -81,58 +71,42 @@ class Player(pygame.sprite.Sprite):
             self.shoot_sound.play()
 
     def move(self, dt):
-        moving = self.direction.length() > 0
-        if moving:
+        if self.direction.length():
             self.direction.normalize_ip()
 
         speed = PLAYER_SPEED
-
-        if self.sprinting and moving:
+        if self.sprinting:
             speed *= SPRINT_MULTIPLIER
             self.stamina -= STAMINA_DRAIN * dt
-            if self.stamina < 0:
+            if self.stamina <= 0:
                 self.stamina = 0
+                self.sprinting = False
         else:
-            # recover alleen als niet sprint
-            self.stamina += STAMINA_RECOVER * dt
-            if self.stamina > STAMINA_MAX:
-                self.stamina = STAMINA_MAX
+            self.stamina = min(STAMINA_MAX, self.stamina + STAMINA_RECOVER * dt)
 
         self.rect.center += self.direction * speed * dt
-
-        # clamp in scherm
-        self.rect.left = max(0, self.rect.left)
-        self.rect.right = min(WIDTH, self.rect.right)
-        self.rect.top = max(0, self.rect.top)
-        self.rect.bottom = min(HEIGHT, self.rect.bottom)
+        self.rect.clamp_ip(pygame.Rect(0, 0, WIDTH, HEIGHT))
 
     def animate(self, dt):
-        # stil staan => frame 0 (geen animatie)
         if self.direction.length() == 0:
-            self.frame_index = 0
             self.image = self.animations[self.status][0]
             return
 
         self.frame_index += PLAYER_ANIMATION_SPEED * dt
         if self.frame_index >= len(self.animations[self.status]):
             self.frame_index = 0
-
         self.image = self.animations[self.status][int(self.frame_index)]
 
     def draw_gun(self, surface):
         mouse = pygame.mouse.get_pos()
-
         angle = math.degrees(math.atan2(
             mouse[1] - self.rect.centery,
             mouse[0] - self.rect.centerx
         ))
 
-        gun = pygame.transform.rotate(self.gun_image_original, -angle)
-
-        # offset zodat het aan de hand hangt
+        gun = pygame.transform.rotate(self.gun_image, -angle)
         offset = pygame.Vector2(18, 6).rotate(angle)
         pos = pygame.Vector2(self.rect.center) + offset
-
         surface.blit(gun, gun.get_rect(center=pos))
 
     def update(self, dt):

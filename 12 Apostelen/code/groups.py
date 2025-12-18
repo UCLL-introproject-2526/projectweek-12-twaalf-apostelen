@@ -6,3 +6,5 @@ class GameGroups:
         self.bullets = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
 
+        # dynamisch aangepast door Game
+        self.enemy_speed = 0

@@ -241,9 +241,7 @@ __marimo__/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
 
-*.wav
 *.mp3
-*.ogg
 *.midi
 *.zip
 *.7z
