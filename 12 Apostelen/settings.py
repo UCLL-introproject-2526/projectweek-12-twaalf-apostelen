@@ -1,6 +1,11 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(__file__)
+
+def asset(path):
+    return os.path.join(BASE_DIR, path)
+
+
 
 WIDTH, HEIGHT = 1280, 720
 FPS = 60

@@ -16,8 +16,7 @@ class Game:
         self.fullscreen = True
         self.screen = pygame.display.set_mode(
         (WIDTH, HEIGHT),
-        pygame.SCALED | pygame.FULLSCREEN
-)
+        pygame.SCALED | pygame.FULLSCREEN)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
 
@@ -340,6 +339,7 @@ class Game:
             await asyncio.sleep(0)
 
         pygame.quit()
+
 
 async def main():
     game = Game()
