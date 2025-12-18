@@ -26,8 +26,8 @@ class Player(pygame.sprite.Sprite):
         self.sprinting = False
 
         self.gun_image = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "gun", "gun.png")
-        ).convert_alpha()
+            pygame.image.load(
+            os.path.join(BASE_DIR, "assets", "images", "gun", "gun.png")).convert_alpha())
 
         self.gun_image = pygame.transform.scale(
             self.gun_image,
@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         )
 
     def import_assets(self):
-        base = os.path.join(BASE_DIR, "images", "player")
+        base = os.path.join(BASE_DIR, "assets" ,"images", "player")
         for d in ["up", "down", "left", "right"]:
             self.animations[d] = load_frames(os.path.join(base, d), PLAYER_SCALE)
 

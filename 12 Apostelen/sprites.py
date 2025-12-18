@@ -17,7 +17,7 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__(groups.all_sprites, groups.bullets)
 
         self.image = pygame.image.load(
-            os.path.join(BASE_DIR, "images", "gun", "bullet.png")
+            os.path.join(BASE_DIR, "assets", "images", "gun", "bullet.png")
         ).convert_alpha()
 
         # optioneel schalen
@@ -65,15 +65,16 @@ class Enemy(pygame.sprite.Sprite):
         self.impact_sound = impact_sound
         if self.game.score <= 75:
             self.frames = load_frames(
-                os.path.join(BASE_DIR, "images", "enemies", enemy_type)
+                os.path.join(BASE_DIR, "assets", "images", "enemies", enemy_type)
             )
         elif self.game.score <= 120:
             self.frames = load_frames(
-            os.path.join(BASE_DIR, "images", "enemies2", enemy_type)
+            os.path.join(BASE_DIR, "assets", "images", "enemies2", enemy_type)
             ) 
         else: 
             self.frames = load_frames(
-            os.path.join(BASE_DIR, "images", "enemies3", enemy_type)
+           os.path.join(BASE_DIR, "assets", "images", "enemies3", enemy_type)
+
             )
 
         self.frame_index = 0
