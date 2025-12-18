@@ -1,3 +1,4 @@
+import asyncio
 import pygame
 import os
 import random
@@ -171,7 +172,7 @@ class Game:
 
     # --------------------------------------------------
 
-    def run(self):
+    async def run(self):
         running = True
         while running:
             dt = self.clock.tick(FPS) / 1000
@@ -315,23 +316,33 @@ class Game:
             # --------------------------------------------------
             # GAME OVER
             elif self.state == "gameover":
+                # normale background
                 self.screen.blit(self.background, (0, 0))
+
+                # zwarte overlay (maakt alles donker / "dead effect")
+                overlay = pygame.Surface(self.screen.get_size())
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(150)  # hoger = donkerder (0-255)
+                self.screen.blit(overlay, (0, 0))
+
+                # teksten
                 self.draw_center_text("GAME OVER", self.font_big, 260)
                 self.draw_center_text(
-                    f"Score: {self.score}",
-                    self.font_mid,
-                    330
-                )
+                f"Score: {self.score}",
+                self.font_mid,
+                330)                            
                 self.draw_center_text(
                     "Press ENTER to try again",
                     self.font_small,
                     400
                 )
-
             pygame.display.update()
+            await asyncio.sleep(0)
 
         pygame.quit()
 
-
+async def main():
+    game = Game()
+    await game.run()
 if __name__ == "__main__":
-    Game().run()
+    asyncio.run(main())
