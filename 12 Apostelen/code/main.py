@@ -12,9 +12,12 @@ class Game:
         pygame.init()
         pygame.mixer.init()
 
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode(
+        (WIDTH, HEIGHT),
+        pygame.SCALED | pygame.FULLSCREEN)
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
+
 
         # fonts
         self.font_big = pygame.font.SysFont(None, 90)
