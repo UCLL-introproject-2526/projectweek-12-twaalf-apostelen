@@ -15,17 +15,45 @@ def load_frames(path, scale=1.0):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, target, groups):
         super().__init__(groups.all_sprites, groups.bullets)
+
         self.image = pygame.image.load(
             os.path.join(BASE_DIR, "images", "gun", "bullet.png")
         ).convert_alpha()
+
+        # optioneel schalen
+        self.image = pygame.transform.scale(
+            self.image,
+            (int(self.image.get_width() * BULLET_SCALE),
+             int(self.image.get_height() * BULLET_SCALE))
+        )
+
         self.rect = self.image.get_rect(center=pos)
 
-        d = pygame.Vector2(target) - pygame.Vector2(pos)
-        self.direction = d.normalize() if d.length() else pygame.Vector2(1,0)
+        direction = pygame.Vector2(target) - pygame.Vector2(pos)
+        if direction.length() == 0:
+            direction = pygame.Vector2(1, 0)
+
+        self.direction = direction.normalize()
+
+        # lifetime (tegen blijven liggen)
+        self.spawn_time = pygame.time.get_ticks()
+        self.lifetime = 2000  # ms
+
+        self.rect = self.image.get_rect(center=pos)
+
 
     def update(self, dt):
         self.rect.center += self.direction * BULLET_SPEED * dt
-        if not pygame.Rect(0,0,WIDTH,HEIGHT).colliderect(self.rect):
+
+    # buiten scherm
+        if (
+            self.rect.right < 0 or self.rect.left > WIDTH or
+            self.rect.bottom < 0 or self.rect.top > HEIGHT
+        ):
+            self.kill()
+
+    # failsafe lifetime
+        if pygame.time.get_ticks() - self.spawn_time > self.lifetime:
             self.kill()
 
 class Enemy(pygame.sprite.Sprite):
