@@ -35,10 +35,19 @@ class Enemy(pygame.sprite.Sprite):
         self.groups = groups
         self.game = game
         self.impact_sound = impact_sound
+        if self.game.score <= 75:
+            self.frames = load_frames(
+                os.path.join(BASE_DIR, "images", "enemies", enemy_type)
+            )
+        elif self.game.score <= 120:
+            self.frames = load_frames(
+            os.path.join(BASE_DIR, "images", "enemies2", enemy_type)
+            ) 
+        elif self.game.score > 130:
+            self.frames = load_frames(
+            os.path.join(BASE_DIR, "images", "enemies3", enemy_type)
+            )
 
-        self.frames = load_frames(
-            os.path.join(BASE_DIR, "images", "enemies", enemy_type)
-        )
         self.frame_index = 0
         self.image = self.frames[0]
         self.rect = self.image.get_rect(center=pos)
