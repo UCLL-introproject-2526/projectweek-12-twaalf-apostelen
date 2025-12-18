@@ -29,7 +29,6 @@ class Bullet(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect(center=pos)
 
-        # 🔴 DIT MOET ER ZIJN
         direction = pygame.Vector2(target) - pygame.Vector2(pos)
         if direction.length() == 0:
             direction = pygame.Vector2(1, 0)
