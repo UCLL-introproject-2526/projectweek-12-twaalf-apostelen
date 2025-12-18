@@ -157,6 +157,8 @@ class Game:
                     elif self.state == "gameover":
                         self.reset_game()
                         self.state = "countdown"
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
+                    self.state = 'intro'
 
             # --------------------------------------------------
             # INTRO
