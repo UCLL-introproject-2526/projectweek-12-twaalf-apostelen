@@ -71,7 +71,7 @@ class Enemy(pygame.sprite.Sprite):
             self.frames = load_frames(
             os.path.join(BASE_DIR, "images", "enemies2", enemy_type)
             ) 
-        elif self.game.score > 130:
+        elif self.game.score < 130:
             self.frames = load_frames(
             os.path.join(BASE_DIR, "images", "enemies3", enemy_type)
             )
