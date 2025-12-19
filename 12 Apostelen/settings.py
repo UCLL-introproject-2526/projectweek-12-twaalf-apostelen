@@ -1,6 +1,11 @@
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(__file__)
+
+def asset(path):
+    return os.path.join(BASE_DIR, path)
+
+
 
 WIDTH, HEIGHT = 1280, 720
 FPS = 60
@@ -30,7 +35,7 @@ ENEMY_ANIMATION_SPEED = 15
 
 # Waves
 KILLS_PER_WAVE = 15          # aantal enemies per wave
-WAVE_TEXT_TIME = 3           # seconden "WAVE X" tonen
+WAVE_TEXT_TIME = 2           # seconden "WAVE X" tonen
 WAVE_SPEED_INCREASE = 18
 WAVE_SPAWN_DECREASE = 0.075
 MIN_SPAWN_INTERVAL = 0.2
@@ -40,5 +45,11 @@ WAVE_SOUND = 1.5
 IMPACT_SOUND = 0.20
 SHOOT_SOUND = 0.60
 DIE_SOUND = 1
+INTRO_MUSIC_VOLUME = 0.6
+
 # Intro / controls
 CONTROLS_TIME = 5.0   # seconden dat controls-scherm zichtbaar is
+
+#AK
+AK_WIDTH = 0.30
+AK_HEIGHT = 0.30
