@@ -44,11 +44,14 @@ class Game:
         self.die_sound.set_volume(DIE_SOUND)
 
         # intro music (1x)
+        # intro music (1x)
         pygame.mixer.music.load(
             os.path.join(BASE_DIR, "assets", "audio", "intro.mp3"))
         pygame.mixer.music.set_volume(INTRO_MUSIC_VOLUME)
         pygame.mixer.music.play(0)
+        pygame.mixer.music.play(0)
 
+        # images
         # images
         bg = pygame.image.load(
             os.path.join(BASE_DIR, "assets", "images", "background.png")).convert()
@@ -63,6 +66,7 @@ class Game:
         self.controls_image = pygame.transform.scale(controls, (WIDTH, HEIGHT))
 
         # state
+        # state
         self.state = "intro"
         self.controls_timer = 0
 
@@ -70,11 +74,17 @@ class Game:
         self.intro_alpha = 255
         self.intro_fade_speed = 120
         self.intro_mode = "in"
+        self.intro_fade_speed = 120
+        self.intro_mode = "in"
 
+        # background fade
         # background fade
         self.fade_alpha = 255
         self.fade_speed = 200
         self.fading = True
+
+        # Save state voor pauze
+        self.prev_state = None
 
         self.reset_game()
 
@@ -97,7 +107,9 @@ class Game:
         self.groups.enemy_speed = ENEMY_SPEED
 
         self.wave_pause = False
+        self.wave_pause = False
         self.wave_timer = 0
+
 
         self.played_die_sound = False
 
@@ -169,6 +181,11 @@ class Game:
         rect = text.get_rect(topright=(WIDTH - 20, 20))
         self.screen.blit(text, rect)
 
+    def draw_pause_menu(self):
+        font = pygame.font.SysFont(None, 60)
+        text = font.render("PAUSED - Press ENTER to Resume", True, (255, 255, 255))
+        self.screen.blit(text, (100, 250))
+
     # --------------------------------------------------
 
     async def run(self):
@@ -180,12 +197,26 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN:      
                     if event.key == pygame.K_ESCAPE:
                         running = False
 
                     if event.key == pygame.K_RETURN:
+                            # ---- PAUSE TOGGLE ----
                         if self.state == "intro":
+                            pygame.mixer.music.stop()
+                            self.intro_mode = "out"
+
+                        if self.state == "game":
+                            self.prev_state = self.state
+                            self.state = "pause"
+
+                        elif self.state == "pause":
+                            self.state = self.prev_state
+                            
+                            # ---- NORMAL ENTER ACTIONS ----
+                        if self.state == "intro":
+                            pygame.mixer.music.stop()
                             pygame.mixer.music.stop()
                             self.intro_mode = "out"
 
@@ -193,6 +224,7 @@ class Game:
                             self.reset_game()
                             self.state = "countdown"
 
+            # ---------- INTRO ----------
             # ---------- INTRO ----------
             if self.state == "intro":
                 self.screen.blit(self.intro_image, (0, 0))
@@ -205,7 +237,8 @@ class Game:
                 if self.intro_mode == "in":
                     self.intro_alpha -= self.intro_fade_speed * dt
                     if self.intro_alpha <= 0:
-                        self.intro_alpha = 0
+                        if self.intro_alpha <= 0:
+                         self.intro_alpha = 0
 
                 else:
                     self.intro_alpha += self.intro_fade_speed * dt
@@ -213,6 +246,7 @@ class Game:
                         self.state = "controls"
                         self.controls_timer = 0
 
+            # ---------- CONTROLS ----------
             # ---------- CONTROLS ----------
             elif self.state == "controls":
                 self.screen.blit(self.controls_image, (0, 0))
@@ -236,6 +270,7 @@ class Game:
                     self.state = "countdown"
 
             # ---------- COUNTDOWN ----------
+            # ---------- COUNTDOWN ----------
             elif self.state == "countdown":
                 self.screen.blit(self.background, (0, 0))
 
@@ -254,6 +289,7 @@ class Game:
                     )
 
             # ---------- GAME ----------
+            # ---------- GAME ----------
             elif self.state == "game":
                 self.screen.blit(self.background, (0, 0))
 
@@ -270,6 +306,7 @@ class Game:
                 self.draw_bars()
                 self.draw_score()
 
+                # WAVE COMPLETE
                 # WAVE COMPLETE
                 if (
                     self.spawned_this_wave >= KILLS_PER_WAVE
@@ -291,6 +328,44 @@ class Game:
                         self.played_die_sound = True
                     self.state = "gameover"
 
+            # ---------- WAVE TEXT ----------
+            elif self.state == "wave_text":
+                self.screen.blit(self.background, (0, 0))
+                self.wave_timer += dt
+
+                self.draw_center_text(
+                    f"WAVE {self.wave}",
+                    self.font_mid,
+                    HEIGHT // 2
+                )
+
+                if self.wave_timer >= WAVE_TEXT_TIME:
+                    self.wave_timer = 0
+                    self.state = "countdown"
+
+            # ---------- GAME OVER ----------
+            # ------------------ PAUSE ------------------
+
+            elif self.state == "pause":
+                self.screen.blit(self.background, (0, 0))
+
+                # dark overlay
+                overlay = pygame.Surface((WIDTH, HEIGHT))
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(180)
+                self.screen.blit(overlay, (0, 0))
+
+                self.draw_center_text(
+                    "PAUSED",
+                    self.font_big,
+                    HEIGHT // 2 - 40
+                )
+                self.draw_center_text(
+                    "Press ENTER to Resume",
+                    self.font_small,
+                    HEIGHT // 2 + 40
+                )
+            # ---------------- GAME OVER ----------------
             # ---------- WAVE TEXT ----------
             elif self.state == "wave_text":
                 self.screen.blit(self.background, (0, 0))

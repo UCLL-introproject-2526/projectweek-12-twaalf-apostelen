@@ -18,6 +18,9 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animations[self.status][0]
         self.rect = self.image.get_rect(center=pos)
 
+        self.last_shot = 0
+        self.shoot_cooldown = BULLET_COOLDOWN
+
         self.direction = pygame.Vector2()
         self.last_shot = 0
         self.health = PLAYER_HEALTH
@@ -64,10 +67,11 @@ class Player(pygame.sprite.Sprite):
 
     def shoot(self):
         now = pygame.time.get_ticks()
-        if now - self.last_shot >= BULLET_COOLDOWN:
+        if now - self.last_shot >= self.shoot_cooldown:
             self.last_shot = now
             Bullet(self.rect.center, pygame.mouse.get_pos(), self.groups)
             self.shoot_sound.play()
+
 
     def move(self, dt):
         if self.direction.length():
@@ -117,3 +121,4 @@ class Player(pygame.sprite.Sprite):
         self.input()
         self.move(dt)
         self.animate(dt)
+    
