@@ -45,5 +45,7 @@ WAVE_SOUND = 1.5
 IMPACT_SOUND = 0.20
 SHOOT_SOUND = 0.60
 DIE_SOUND = 1
+INTRO_MUSIC_VOLUME = 0.6
+
 # Intro / controls
 CONTROLS_TIME = 5.0   # seconden dat controls-scherm zichtbaar is
