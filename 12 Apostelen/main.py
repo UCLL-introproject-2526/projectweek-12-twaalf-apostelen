@@ -237,8 +237,8 @@ class Game:
                 if self.intro_mode == "in":
                     self.intro_alpha -= self.intro_fade_speed * dt
                     if self.intro_alpha <= 0:
-                    if self.intro_alpha <= 0:
-                        self.intro_alpha = 0
+                        if self.intro_alpha <= 0:
+                         self.intro_alpha = 0
 
                 else:
                     self.intro_alpha += self.intro_fade_speed * dt
