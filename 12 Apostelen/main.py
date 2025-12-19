@@ -65,6 +65,14 @@ class Game:
             os.path.join(BASE_DIR, "assets", "images", "controls.png")).convert()
         self.controls_image = pygame.transform.scale(controls, (WIDTH, HEIGHT))
 
+        # weapon unlock (wave 10)
+        self.weapon_unlocked = False
+        self.weapon_unlock_timer = 0
+
+        self.new_weapon_image = pygame.image.load(
+            os.path.join(BASE_DIR, "assets", "images", "New.png")).convert_alpha()
+
+
         # state
         # state
         self.state = "intro"
@@ -85,6 +93,11 @@ class Game:
 
         # Save state voor pauze
         self.prev_state = None
+
+        self.weapon_unlock_started = False
+        self.weapon_unlocked = False
+        self.weapon_unlock_timer = 0
+
 
         self.reset_game()
 
@@ -113,6 +126,9 @@ class Game:
 
         self.played_die_sound = False
 
+        self.weapon_unlocked = False
+        self.weapon_unlock_timer = 0
+
         self.countdown = 3
         self.countdown_timer = 0
 
@@ -120,6 +136,11 @@ class Game:
 
         self.fade_alpha = 255
         self.fading = True
+
+        self.weapon_unlock_started = False
+        self.weapon_unlocked = False
+        self.weapon_unlock_timer = 0
+
 
     # --------------------------------------------------
 
@@ -306,6 +327,14 @@ class Game:
                 self.draw_bars()
                 self.draw_score()
 
+                # -------- WEAPON UNLOCK AT WAVE 10 --------
+                if self.wave == 10 and not self.weapon_unlocked:
+                    self.weapon_unlocked = True
+                    self.weapon_unlock_timer = 0
+                    self.prev_state = "game"
+                    self.state = "weapon_unlock"
+
+
                 # WAVE COMPLETE
                 # WAVE COMPLETE
                 if (
@@ -398,6 +427,47 @@ class Game:
                     400
                 )
 
+            elif self.state == "weapon_unlock":
+                self.screen.blit(self.background, (0, 0))
+
+                # HUD blijft zichtbaar
+                self.groups.all_sprites.draw(self.screen)
+                self.player.draw_gun(self.screen)
+                self.draw_bars()
+                self.draw_score()
+
+                # NEW.png tonen
+                rect = self.new_weapon_image.get_rect(
+                    center=(WIDTH // 2, HEIGHT // 2)
+                )
+                self.screen.blit(self.new_weapon_image, rect)
+
+                # ⏱️ TIMER LOOPT OP (NIET resetten!)
+                self.weapon_unlock_timer += dt
+
+                # ⬇️ DIT MOET BEREIKBAAR ZIJN
+                if self.weapon_unlock_timer >= 3:
+                    # gun2 laden en schalen
+                    gun2 = pygame.image.load(
+                        os.path.join(BASE_DIR, "assets", "images", "gun", "gun2.png")
+                    ).convert_alpha()
+
+                    gun2 = pygame.transform.scale(
+                        gun2,
+                        (
+                            int(gun2.get_width() * AK_WIDTH),
+                            int(gun2.get_height() * AK_HEIGHT)
+                        )
+                    )
+
+                    # gun effectief veranderen
+                    self.player.gun_image = gun2
+                    self.player.shoot_cooldown = BULLET_COOLDOWN * 0.5
+                    self.player.last_shot = 0
+
+                    # 🔴 DIT IS ESSENTIEEL
+                    self.weapon_unlocked = True
+                    self.state = "countdown"
             pygame.display.update()
             await asyncio.sleep(0)
 
