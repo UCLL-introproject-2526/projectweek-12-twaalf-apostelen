@@ -43,36 +43,35 @@ class Game:
             os.path.join(BASE_DIR, "assets", "audio", "Die.mp3"))
         self.die_sound.set_volume(DIE_SOUND)
 
-        # intro music — SPEELT 1 KEER
+        # intro music (1x)
         pygame.mixer.music.load(
             os.path.join(BASE_DIR, "assets", "audio", "intro.mp3"))
         pygame.mixer.music.set_volume(INTRO_MUSIC_VOLUME)
-        pygame.mixer.music.play(0)   # ❗ GEEN LOOP
+        pygame.mixer.music.play(0)
 
-        # background
+        # images
         bg = pygame.image.load(
             os.path.join(BASE_DIR, "assets", "images", "background.png")).convert()
         self.background = pygame.transform.scale(bg, (WIDTH, HEIGHT))
 
-        # intro image
         intro = pygame.image.load(
             os.path.join(BASE_DIR, "assets", "images", "intro.png")).convert()
         self.intro_image = pygame.transform.scale(intro, (WIDTH, HEIGHT))
 
-        # controls image
         controls = pygame.image.load(
             os.path.join(BASE_DIR, "assets", "images", "controls.png")).convert()
         self.controls_image = pygame.transform.scale(controls, (WIDTH, HEIGHT))
 
+        # state
         self.state = "intro"
         self.controls_timer = 0
 
         # intro fade
         self.intro_alpha = 255
-        self.intro_fade_speed = 40
-        self.intro_mode = "in"   # in / out
+        self.intro_fade_speed = 120
+        self.intro_mode = "in"
 
-        # bestaande fade voor background
+        # background fade
         self.fade_alpha = 255
         self.fade_speed = 200
         self.fading = True
@@ -97,7 +96,9 @@ class Game:
         self.spawn_interval = 1.1
         self.groups.enemy_speed = ENEMY_SPEED
 
+        self.wave_pause = False
         self.wave_timer = 0
+
         self.played_die_sound = False
 
         self.countdown = 3
@@ -143,22 +144,6 @@ class Game:
 
     # --------------------------------------------------
 
-    def toggle_fullscreen(self):
-        self.fullscreen = not self.fullscreen
-
-        if self.fullscreen:
-            self.screen = pygame.display.set_mode(
-                (WIDTH, HEIGHT),
-                pygame.SCALED | pygame.FULLSCREEN
-            )
-        else:
-            self.screen = pygame.display.set_mode(
-                (WIDTH, HEIGHT),
-                pygame.SCALED
-            )
-
-    # --------------------------------------------------
-
     def draw_bars(self):
         x, y = 20, 20
         w, h = 300, 20
@@ -201,17 +186,14 @@ class Game:
 
                     if event.key == pygame.K_RETURN:
                         if self.state == "intro":
-                            pygame.mixer.music.stop()   # ❗ stopt intro.mp3
+                            pygame.mixer.music.stop()
                             self.intro_mode = "out"
 
                         elif self.state == "gameover":
                             self.reset_game()
                             self.state = "countdown"
 
-                    if event.key == pygame.K_F11:
-                        self.toggle_fullscreen()
-
-            # ---------------- INTRO ----------------
+            # ---------- INTRO ----------
             if self.state == "intro":
                 self.screen.blit(self.intro_image, (0, 0))
 
@@ -222,17 +204,16 @@ class Game:
 
                 if self.intro_mode == "in":
                     self.intro_alpha -= self.intro_fade_speed * dt
-                    if self.intro_alpha < 0:
+                    if self.intro_alpha <= 0:
                         self.intro_alpha = 0
 
                 else:
                     self.intro_alpha += self.intro_fade_speed * dt
                     if self.intro_alpha >= 255:
-                        self.intro_alpha = 255
                         self.state = "controls"
                         self.controls_timer = 0
 
-            # ---------------- CONTROLS ----------------
+            # ---------- CONTROLS ----------
             elif self.state == "controls":
                 self.screen.blit(self.controls_image, (0, 0))
                 self.controls_timer += dt
@@ -254,19 +235,9 @@ class Game:
                 if self.controls_timer >= CONTROLS_TIME:
                     self.state = "countdown"
 
-            # ---------------- COUNTDOWN ----------------
+            # ---------- COUNTDOWN ----------
             elif self.state == "countdown":
                 self.screen.blit(self.background, (0, 0))
-
-                if self.fading:
-                    fade = pygame.Surface((WIDTH, HEIGHT))
-                    fade.fill((0, 0, 0))
-                    fade.set_alpha(self.fade_alpha)
-                    self.screen.blit(fade, (0, 0))
-                    self.fade_alpha -= self.fade_speed * dt
-                    if self.fade_alpha <= 0:
-                        self.fade_alpha = 0
-                        self.fading = False
 
                 self.countdown_timer += dt
                 if self.countdown_timer >= 1:
@@ -282,7 +253,7 @@ class Game:
                         HEIGHT // 2
                     )
 
-            # ---------------- GAME ----------------
+            # ---------- GAME ----------
             elif self.state == "game":
                 self.screen.blit(self.background, (0, 0))
 
@@ -299,6 +270,7 @@ class Game:
                 self.draw_bars()
                 self.draw_score()
 
+                # WAVE COMPLETE
                 if (
                     self.spawned_this_wave >= KILLS_PER_WAVE
                     and len(self.groups.enemies) == 0
@@ -319,7 +291,22 @@ class Game:
                         self.played_die_sound = True
                     self.state = "gameover"
 
-            # ---------------- GAME OVER ----------------
+            # ---------- WAVE TEXT ----------
+            elif self.state == "wave_text":
+                self.screen.blit(self.background, (0, 0))
+                self.wave_timer += dt
+
+                self.draw_center_text(
+                    f"WAVE {self.wave}",
+                    self.font_mid,
+                    HEIGHT // 2
+                )
+
+                if self.wave_timer >= WAVE_TEXT_TIME:
+                    self.wave_timer = 0
+                    self.state = "countdown"
+
+            # ---------- GAME OVER ----------
             elif self.state == "gameover":
                 self.screen.blit(self.background, (0, 0))
                 overlay = pygame.Surface((WIDTH, HEIGHT))
