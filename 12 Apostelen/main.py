@@ -77,6 +77,9 @@ class Game:
         self.fade_speed = 200
         self.fading = True
 
+        # Save state voor pauze
+        self.prev_state = None
+
         self.reset_game()
 
     # --------------------------------------------------
@@ -184,6 +187,11 @@ class Game:
         rect = text.get_rect(topright=(WIDTH - 20, 20))
         self.screen.blit(text, rect)
 
+    def draw_pause_menu(self):
+        font = pygame.font.SysFont(None, 60)
+        text = font.render("PAUSED - Press ENTER to Resume", True, (255, 255, 255))
+        self.screen.blit(text, (100, 250))
+
     # --------------------------------------------------
 
     async def run(self):
@@ -196,12 +204,25 @@ class Game:
                     running = False
 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
+                    
 
                     if event.key == pygame.K_RETURN:
+                            # ---- PAUSE TOGGLE ----
                         if self.state == "intro":
                             pygame.mixer.music.stop()   # ❗ stopt intro.mp3
+                            self.intro_mode = "out"
+
+                        if self.state == "game":
+                            self.prev_state = self.state
+                            self.state = "pause"
+                            continue
+
+                        elif self.state == "pause":
+                            self.state = self.prev_state
+                            continue
+                            # ---- NORMAL ENTER ACTIONS ----
+                        if self.state == "intro":
+                            pygame.mixer.music.stop()
                             self.intro_mode = "out"
 
                         elif self.state == "gameover":
@@ -318,7 +339,27 @@ class Game:
                         self.die_sound.play()
                         self.played_die_sound = True
                     self.state = "gameover"
+            # ------------------ PAUSE ------------------
 
+            elif self.state == "pause":
+                self.screen.blit(self.background, (0, 0))
+
+                # dark overlay
+                overlay = pygame.Surface((WIDTH, HEIGHT))
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(180)
+                self.screen.blit(overlay, (0, 0))
+
+                self.draw_center_text(
+                    "PAUSED",
+                    self.font_big,
+                    HEIGHT // 2 - 40
+                )
+                self.draw_center_text(
+                    "Press ENTER to Resume",
+                    self.font_small,
+                    HEIGHT // 2 + 40
+                )
             # ---------------- GAME OVER ----------------
             elif self.state == "gameover":
                 self.screen.blit(self.background, (0, 0))
